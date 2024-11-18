@@ -26,9 +26,9 @@ As I mentioned before, this project was originally tailored for my single page a
 This problem does some checking (but not a lot). This is once again to keep it simple and efficient and allows for more flexibility. This does however also mean you can make more mistakes. The program trusts you to not do stupid things.
 
 ## FAQ
-- Have you ever heard of `Jinja2`?
+- **Have you ever heard of `Jinja2`?**
 *As a matter of fact I have. I do like to create my own solutions (and problems) at times. And as I needed something light and wanted to brush up on my python knowledge anyway, this seemed reasonable.*
-- I have an idea/bug/question/...
+- **I have an idea/bug/question/...**
 *For most things I suggest just creating a `GitHub` issue. For something not related to the project itself you can email me.*
-- This sucks.
+- **This sucks.**
 *I know.*
