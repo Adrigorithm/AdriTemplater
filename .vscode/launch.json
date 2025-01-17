@@ -12,8 +12,8 @@
             "console": "integratedTerminal",
             "args": [
                 "translations.csv",
-                ".",
-                "template.html"
+                "app",
+                "translated"
             ]
         }
     ]

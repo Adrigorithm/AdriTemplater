@@ -11,15 +11,15 @@ def init() -> tuple[str, str, str, str, str, str]:
     )
 
     parser.add_argument("language_file", help="csv file of languages where the headings are the language codes")
+    parser.add_argument("input_dir", help="input directory of where the to be templated files are")
     parser.add_argument("output_dir", help="output directory of where the templated files will go")
-    parser.add_argument("template_file", help="file to be templated")
     parser.add_argument("-d", "--delimiter", help="delimiter used in the language csv file")
     parser.add_argument("-l", "--left", help="string on the left side of the to be templated string")
     parser.add_argument("-r", "--right", help="string on the right side of the to be templated string")
 
     args = parser.parse_args()
 
-    return args.language_file, args.output_dir, args.template_file, args.delimiter, args.left, args.right
+    return args.language_file, args.input_dir, args.output_dir, args.delimiter, args.left, args.right
 
 def get_defaults() -> dict[str, str]:
     return dict([("delimiter", ';'), ("left", '«'), ("right", '»')])
@@ -103,18 +103,30 @@ def template(template_file: str, language_map: dict[str, list[str]], left: str, 
 
     return templated_strings
 
-def write(templated_strings: dict[str, str], output_dir: str):
+def write(templated_strings: dict[str, str], output_dir: str, filepath_dir: str, filepath: str):
     for lang, string in templated_strings.items():
         path = os.path.join(output_dir, lang)
 
         if not os.path.isdir(path):
             os.mkdir(path)
 
-        with open(os.path.join(path, "index.html"), "w") as file:
+        with open(os.path.join(path, filepath), "w") as file:
             file.write(string)
 
+def join_dirnames(dirpath: str, dirnames: [str]):
+    directory = ""
 
-def main(language_file: str, output_dir: str, template_file: str, delimiter: str, left: str, right: str) -> None:
+    directories = dirpath.split("//")
+
+    if directories.count() > 1:
+        for dir in range(1, len(directories)):
+            directory += f"{dirname}/"
+
+    directory += f"{dirname}/"
+
+    return directory
+
+def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, left: str, right: str) -> None:
     defaults = get_defaults()
 
     if delimiter == None:
@@ -128,9 +140,12 @@ def main(language_file: str, output_dir: str, template_file: str, delimiter: str
     if right == None:
         right = defaults.get("right")
 
-    templated_strings = template(template_file, language_map, left, right)
+    for dirpath, dirnames, filenames in os.walk(input_dir):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            templated_strings = template(filepath, language_map, left, right)
 
-    write(templated_strings, output_dir)
+            write(templated_strings, output_dir, join_dirnames(dirpath, dirnames), filename)
 
 if __name__ == "__main__":
     args = init()
