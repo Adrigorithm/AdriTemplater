@@ -103,26 +103,26 @@ def template(template_file: str, language_map: dict[str, list[str]], left: str, 
 
     return templated_strings
 
-def write(templated_strings: dict[str, str], output_dir: str, filepath_dir: str, filepath: str):
+def write(templated_strings: dict[str, str], output_dir: str, file_path_dir: str, file_name: str):
     for lang, string in templated_strings.items():
         path = os.path.join(output_dir, lang)
 
         if not os.path.isdir(path):
             os.mkdir(path)
 
-        with open(os.path.join(path, filepath), "w") as file:
+        with open(f"{file_path_dir}{file_name}", "w") as file:
             file.write(string)
 
-def join_dirnames(dirpath: str, dirnames: [str]):
-    directory = ""
+def create_dir_path(dir_path: str, dir_names: [str]):
+    directory = f".{os.sep}"
 
-    directories = dirpath.split("//")
+    directories = dir_path.split(os.sep)
 
-    if directories.count() > 1:
-        for dir in range(1, len(directories)):
-            directory += f"{dirname}/"
+    for dir in directories:
+        directory += f"{dir}{os.sep}"
 
-    directory += f"{dirname}/"
+    for dir in dir_names:
+        directory += f"{dir}{os.sep}"
 
     return directory
 
@@ -140,12 +140,15 @@ def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, le
     if right == None:
         right = defaults.get("right")
 
-    for dirpath, dirnames, filenames in os.walk(input_dir):
-        for filename in filenames:
-            filepath = os.path.join(dirpath, filename)
-            templated_strings = template(filepath, language_map, left, right)
+    for dir_path, dir_names, file_names in os.walk(input_dir):
+        print(f"{dir_path} {dir_names} {file_names}")
+        dir_path = create_dir_path(dir_path, dir_names)
+        print(dir_path)
+        continue
+        file_path = os.path.join(dirpath, filename)
+        templated_strings = template(filepath, language_map, left, right)
 
-            write(templated_strings, output_dir, join_dirnames(dirpath, dirnames), filename)
+        write(templated_strings, output_dir, create_path(dir_path, dir_names), filename)
 
 if __name__ == "__main__":
     args = init()
