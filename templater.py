@@ -116,10 +116,13 @@ def write(templated_strings: dict[str, str], output_dir: str, file_path_dir: str
 def create_dir_path(dir_path: str, dir_names: [str]):
     directory = f".{os.sep}"
 
+    if (len(dir_names) == 0):
+        return directory
+
     directories = dir_path.split(os.sep)
 
-    for dir in directories:
-        directory += f"{dir}{os.sep}"
+    for dirIndex in range(1, len(directories)):
+        directory += f"{directories[dirIndex]}{os.sep}"
 
     for dir in dir_names:
         directory += f"{dir}{os.sep}"
@@ -141,9 +144,8 @@ def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, le
         right = defaults.get("right")
 
     for dir_path, dir_names, file_names in os.walk(input_dir):
-        print(f"{dir_path} {dir_names} {file_names}")
-        dir_path = create_dir_path(dir_path, dir_names)
-        print(dir_path)
+        print(f"{dir_path} {dir_names} {file_names}", end="\n")
+        print(create_dir_path(dir_path, dir_names), end="\n\n")
         continue
         file_path = os.path.join(dirpath, filename)
         templated_strings = template(filepath, language_map, left, right)
