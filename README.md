@@ -16,6 +16,8 @@ An example command could be:
 - `python3 templater.py translations.csv app translated`
 This will do a few things. It will recursively copy all files from the `translated` directory whist replacing every **template string** with a matching translation. For every language it can find in `translations.csv`, it will create a directory named so in `app` and create all the templated files for the languages inside. The directory tree remains unchanged after the language directories (screenshot below).
 - **template string** is something like `< n >` where `n` should be an integer matching the translations on line nr. `n + 2`. So `< 0 >` would match the 2nd line of `translations.csv`, which is the first actual translation.
+### Sample (after running script)
+![sample](https://github.com/user-attachments/assets/e4e77e83-863a-4123-ab2b-d12a8ae99131)
 
 ### Limitations
 - **One char delimiters**: Currently you can only set one character delimiters, this is done to keep the program efficient and less complex, I plan to change this however, to increase customizability.
