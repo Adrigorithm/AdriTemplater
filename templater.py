@@ -105,12 +105,11 @@ def template(template_file: str, language_map: dict[str, list[str]], left: str, 
 
 def write(templated_strings: dict[str, str], output_dir: str, file_path_dir: str, file_name: str):
     for lang, string in templated_strings.items():
-        path = os.path.join(output_dir, lang)
+        path = os.path.join(output_dir, lang, file_path_dir)
 
-        if not os.path.isdir(path):
-            os.mkdir(path)
+        os.makedirs(path, exist_ok=True)
 
-        with open(f"{file_path_dir}{file_name}", "w") as file:
+        with open(f"{path}{file_name}", "w") as file:
             file.write(string)
 
 def create_dir_path(dir_path: str, dir_names: [str]):
@@ -144,13 +143,10 @@ def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, le
         right = defaults.get("right")
 
     for dir_path, dir_names, file_names in os.walk(input_dir):
-        print(f"{dir_path} {dir_names} {file_names}", end="\n")
-        print(create_dir_path(dir_path, dir_names), end="\n\n")
-        continue
-        file_path = os.path.join(dirpath, filename)
-        templated_strings = template(filepath, language_map, left, right)
+        dir_path = create_dir_path(dir_path, dir_names)
+        templated_strings = template(os.path.join(input_dir, dir_path, file_names[0]), language_map, left, right)
 
-        write(templated_strings, output_dir, create_path(dir_path, dir_names), filename)
+        write(templated_strings, output_dir, dir_path, file_names[0])
 
 if __name__ == "__main__":
     args = init()
