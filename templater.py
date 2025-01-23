@@ -88,7 +88,7 @@ def template(template_file: str, language_map: dict[str, list[str]], left: str, 
     for key in list(language_map.keys()):
         templated_strings[key] = ""
 
-    with open(template_file) as file:
+    with open(template_file, encoding="utf-8") as file:
         for line in file.readlines():
             char_index = 0
 
