@@ -1,4 +1,6 @@
 {
-    "blacklistMode": 0,
-    "whitelistMode": 0
+    "whitelist_mode": true,
+    "patterns": [
+        "**/*.dis"
+    ]
 }

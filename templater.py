@@ -1,5 +1,7 @@
 import argparse
+import glob
 import os
+import json
 
 from ast import Tuple
 
@@ -22,7 +24,7 @@ def init() -> tuple[str, str, str, str, str, str]:
     return args.language_file, args.input_dir, args.output_dir, args.delimiter, args.left, args.right
 
 def get_defaults() -> dict[str, str]:
-    return dict([("delimiter", ';'), ("left", '«'), ("right", '»')])
+    return dict([("delimiter", ';'), ("left", '«'), ("right", '»'), ("config_file_path", "templaterconfig.json")])
 
 def parse_languages(languages: list[str]) -> dict[str, list[str]]:
     language_map = dict()
@@ -30,6 +32,10 @@ def parse_languages(languages: list[str]) -> dict[str, list[str]]:
         language_map[lang.strip()] = list()
 
     return language_map
+
+def parse_config_file(file_name):
+    with open(file_name) as file:
+        return json.load(file)
 
 def content_language_mapper(language_file: str, delimiter: str) -> dict[str, list[str]]:
     language_map = None
@@ -128,8 +134,35 @@ def create_dir_path(dir_path: str, dir_names: [str]):
 
     return directory
 
+def get_file_paths(root_dir: str, patterns: list, whitelist: bool) -> set[str]:
+    if whitelist:
+        if len(patterns) == 0:
+            return set()
+        
+        return get_globbed_files(patterns, True, True)
+    
+    
+
+    os.chdir(root_dir)
+    
+    files = set()
+    
+    return files
+
+def get_globbed_files(patterns: list, include_hidden: bool, recursive: bool) -> set[str]:
+    files = set()
+
+    for pattern in patterns:
+        file_list = glob.glob(pattern, include_hidden=include_hidden, recursive=recursive)
+        [files.add(file) for file in file_list]
+    
+    return files
+
+
 def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, left: str, right: str) -> None:
     defaults = get_defaults()
+    config = parse_config_file(defaults.get("config_file_path"))
+    files_to_template = get_file_paths(input_dir, config["patterns"], config["whitelist_mode"])
 
     if delimiter == None:
         delimiter = defaults.get("delimiter")
