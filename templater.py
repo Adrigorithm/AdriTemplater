@@ -109,45 +109,22 @@ def template(template_file: str, language_map: dict[str, list[str]], left: str, 
 
     return templated_strings
 
-def write(templated_strings: dict[str, str], output_dir: str, file_path_dir: str, file_name: str):
+def write(templated_strings: dict[str, str], output_dir: str, dir_path: str, file_name: str) -> None:
     for lang, string in templated_strings.items():
-        path = os.path.join(output_dir, lang, file_path_dir)
+        path = os.path.join(output_dir, lang, dir_path)
 
         os.makedirs(path, exist_ok=True)
 
-        with open(f"{path}{file_name}", "w") as file:
+        with open(f"{path}{os.sep}{file_name}", "w") as file:
             file.write(string)
 
-def create_dir_path(dir_path: str, dir_names: [str]):
-    directory = f".{os.sep}"
+def get_file_paths(root_dir: str, patterns: list) -> set[str]:
+    """Returns a Set of all files matching a globbing patterns. Returns all files if no pattern is found"""
 
-    if (len(dir_names) == 0):
-        return directory
-
-    directories = dir_path.split(os.sep)
-
-    for dirIndex in range(1, len(directories)):
-        directory += f"{directories[dirIndex]}{os.sep}"
-
-    for dir in dir_names:
-        directory += f"{dir}{os.sep}"
-
-    return directory
-
-def get_file_paths(root_dir: str, patterns: list, whitelist: bool) -> set[str]:
-    if whitelist:
-        if len(patterns) == 0:
-            return set()
+    if len(patterns) == 0:
+            return get_globbed_files(["**/*"])
         
-        return get_globbed_files(patterns, True, True)
-    
-    
-
-    os.chdir(root_dir)
-    
-    files = set()
-    
-    return files
+    return get_globbed_files(patterns, True, True)
 
 def get_globbed_files(patterns: list, include_hidden: bool, recursive: bool) -> set[str]:
     files = set()
@@ -158,11 +135,23 @@ def get_globbed_files(patterns: list, include_hidden: bool, recursive: bool) -> 
     
     return files
 
+# TODO: Try to make this not needed
+def strip_parent_dir_and_file(path: str) -> tuple[str, str, str]:
+    """Returns a tuple of 3 items: upper directory, intermediary directory path, file name"""
+    parent_dir_index = path.index(os.sep)
+    file_name_index = path.rindex(os.sep)
+
+    parent_dir = path[0:parent_dir_index]
+    intermediary_dirs = path[parent_dir_index + 1:file_name_index]
+    file_name = path[file_name_index + 1::]
+
+    return parent_dir, intermediary_dirs, file_name # parent_dir output is currently not used
+
 
 def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, left: str, right: str) -> None:
     defaults = get_defaults()
     config = parse_config_file(defaults.get("config_file_path"))
-    files_to_template = get_file_paths(input_dir, config["patterns"], config["whitelist_mode"])
+    files_to_template = get_file_paths(input_dir, config["patterns"])
 
     if delimiter == None:
         delimiter = defaults.get("delimiter")
@@ -175,11 +164,11 @@ def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, le
     if right == None:
         right = defaults.get("right")
 
-    for dir_path, dir_names, file_names in os.walk(input_dir):
-        dir_path = create_dir_path(dir_path, dir_names)
-        templated_strings = template(os.path.join(input_dir, dir_path, file_names[0]), language_map, left, right)
+    for file_path in files_to_template:
+        templated_strings = template(file_path, language_map, left, right)
+        output_dirs = strip_parent_dir_and_file(file_path)
 
-        write(templated_strings, output_dir, dir_path, file_names[0])
+        write(templated_strings, output_dir, output_dirs[1], output_dirs[2])
 
 if __name__ == "__main__":
     args = init()
