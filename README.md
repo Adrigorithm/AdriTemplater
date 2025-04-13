@@ -8,7 +8,7 @@ You only need the python file, but you can use the additional files as a startin
 - `cd AdriTemplater`
 
 ### Where is my pip package? wtf?
-**No.** This code is not near production ready, I might make it so someday, provided this project is actually used by somebody.
+**No.** I CBA to do this, it's just a singular python file, it makes no sense to me to put this on pip pkgs.
 
 Now it is time to run the script (You will need `python` to run this).
 - `python3 templater.py` (or `python3 templater.py -h`) will show you the CLI synompsis, this is your main reference.
@@ -26,7 +26,7 @@ This will do a few things. It will recursively copy all files from the `translat
 
 ## FAQ
 - **Have you ever heard of `Jinja2`?**
-*As a matter of fact I have. I do like to create my own solutions (and problems) at times. And as I needed something light and wanted to brush up on my python knowledge anyway, this seemed reasonable.*
+*As a matter of fact I have. I do like to create my own solutions (and problems) at times. Furthermore, Jinja2 is much too bloated for what I plan to use this for. AdriTemplator is much easier to use and just works without configuring anything but a single file, across operating systems.*
 - **I have an idea/bug/question/...**
 *For most things I suggest just creating a `GitHub` issue. For something not related to the project itself you can email me.*
 - **This sucks.**
