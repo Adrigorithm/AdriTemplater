@@ -122,16 +122,21 @@ def get_file_paths(root_dir: str, patterns: list) -> set[str]:
     """Returns a Set of all files matching a globbing patterns. Returns all files if no pattern is found"""
 
     if len(patterns) == 0:
-            return get_globbed_files(["**/*"], True, True)
+            return get_globbed_files(root_dir, ["**/*"], True, True)
         
-    return get_globbed_files(patterns, True, True)
+    return get_globbed_files(root_dir, patterns, True, True)
 
-def get_globbed_files(patterns: list, include_hidden: bool, recursive: bool) -> set[str]:
+def get_globbed_files(root_dir: str, patterns: list, include_hidden: bool, recursive: bool) -> set[str]:
     files = set()
 
     for pattern in patterns:
-        file_list = glob.glob(pattern, include_hidden=include_hidden, recursive=recursive)
-        [files.add(file) for file in file_list]
+        file_list = glob.glob(pattern, include_hidden=include_hidden, recursive=recursive, root_dir=root_dir)
+
+        for file in file_list:
+            path_full = os.path.join(root_dir, file)
+
+            if os.path.isfile(os.path.join(path_full)):
+                files.add(path_full)
     
     return files
 
