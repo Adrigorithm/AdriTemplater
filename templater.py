@@ -24,7 +24,7 @@ def init() -> tuple[str, str, str, str, str, str]:
     return args.language_file, args.input_dir, args.output_dir, args.delimiter, args.left, args.right
 
 def get_defaults() -> dict[str, str]:
-    return dict([("delimiter", ';'), ("left", '«'), ("right", '»'), ("config_file_path", "templaterconfig.json")])
+    return dict([("delimiter", ';'), ("left", '«'), ("right", '»'), ("config_file_path", "templater_config.json")])
 
 def parse_languages(languages: list[str]) -> dict[str, list[str]]:
     language_map = dict()
@@ -62,12 +62,12 @@ def content_language_mapper(language_file: str, delimiter: str) -> dict[str, lis
         return language_map
 
 def match(input_str: str, end_str: str) -> tuple[str, int]:
-    match = ""
+    template_match = ""
     index = 0
 
     while index < len(input_str):
         if input_str[index].isnumeric():
-            match += input_str[index]
+            template_match += input_str[index]
             index += 1
             continue
 
@@ -76,10 +76,10 @@ def match(input_str: str, end_str: str) -> tuple[str, int]:
 
         index += 1
 
-    return match, index
+    return template_match, index
 
-def add_string(lang_content_map: dict[str, str], language_map: dict[str, list[str]], string: str, isVariable: bool) -> dict[str, str]:
-    if isVariable:
+def add_string(lang_content_map: dict[str, str], language_map: dict[str, list[str]], string: str, variable: bool) -> dict[str, str]:
+    if variable:
         for key in list(lang_content_map.keys()):
             lang_content_map[key] += language_map[key][int(string)]
     else:
@@ -122,7 +122,7 @@ def get_file_paths(root_dir: str, patterns: list) -> set[str]:
     """Returns a Set of all files matching a globbing patterns. Returns all files if no pattern is found"""
 
     if len(patterns) == 0:
-            return get_globbed_files(["**/*"])
+            return get_globbed_files(["**/*"], True, True)
         
     return get_globbed_files(patterns, True, True)
 
@@ -153,15 +153,15 @@ def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, le
     config = parse_config_file(defaults.get("config_file_path"))
     files_to_template = get_file_paths(input_dir, config["patterns"])
 
-    if delimiter == None:
+    if delimiter is None:
         delimiter = defaults.get("delimiter")
 
     language_map = content_language_mapper(language_file, delimiter)
 
-    if left == None:
+    if left is None:
         left = defaults.get("left")
 
-    if right == None:
+    if right is None:
         right = defaults.get("right")
 
     for file_path in files_to_template:
@@ -173,3 +173,38 @@ def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, le
 if __name__ == "__main__":
     args = init()
     main(args[0], args[1], args[2], args[3], args[4], args[5])
+
+class TemplaterConfig:
+    input_dir = None
+
+    def __init__(self, input_dir: str, output_dir: str, patterns: list[str], language_file: str, language_file_delimiter: str, template_char_left: str, template_char_right: str) -> None:
+        self.input_dir = input_dir
+        self.output_dir = output_dir
+        self.patterns = patterns
+        self.language_file = language_file
+        self.language_file_delimiter = language_file_delimiter
+        self.template_char_left = template_char_left
+        self.template_char_right = template_char_right
+    
+    @classmethod
+    def from_json_file(cls, path: str) -> "TemplaterConfig":
+        with open(path) as file:
+            property_map = json.load(file)
+
+            return TemplaterConfig.from_dictionary(property_map)
+
+    @classmethod
+    def from_dictionary(cls, property_map: dict) -> "TemplaterConfig":
+        input_dir = property_map.get("input_dir", '.')
+        output_dir = property_map.get("output_dir", '.')
+        patterns = property_map.get("patterns", ["**/*"])
+        language_file = property_map.get("language_file", "translations.csv")
+        language_file_delimiter = property_map.get("language_file_delimiter", "delimiter")
+        template_char_left = property_map.get("template_char_left", '«')
+        template_char_right = property_map.get("template_char_left", '»')
+
+        return TemplaterConfig(input_dir, output_dir, patterns, language_file, language_file_delimiter, template_char_left, template_char_right)
+
+    @classmethod
+    def from_args(cls, cmd_args: tuple[str]) -> "TemplaterConfig":
+        return TemplaterConfig()
