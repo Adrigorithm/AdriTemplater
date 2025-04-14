@@ -1,4 +1,4 @@
-import argparse
+import argparse»
 import glob
 import os
 import json
@@ -13,11 +13,11 @@ class TemplaterConfig:
     template_char_right = None
 
     def __init__(self, patterns: list[str], language_file: str, language_file_delimiter: str, template_char_left: str, template_char_right: str) -> None:
-        self.patterns = patterns
-        self.language_file = language_file
-        self.language_file_delimiter = language_file_delimiter
-        self.template_char_left = template_char_left
-        self.template_char_right = template_char_right
+        self.patterns = ["**/*"] if patterns is None else patterns
+        self.language_file = "translations.csv" if language_file is None else language_file
+        self.language_file_delimiter = ';' if language_file_delimiter is None else language_file_delimiter
+        self.template_char_left = '«' if template_char_left is None else template_char_left
+        self.template_char_right = '»' if template_char_right is None else template_char_right
     
     @classmethod
     def from_json_file(cls, path: str) -> "TemplaterConfig":
@@ -28,11 +28,11 @@ class TemplaterConfig:
 
     @classmethod
     def from_dictionary(cls, property_map: dict) -> "TemplaterConfig":
-        patterns = property_map.get("patterns", ["**/*"])
-        language_file = property_map.get("language_file", "translations.csv")
-        language_file_delimiter = property_map.get("language_file_delimiter", "delimiter")
-        template_char_left = property_map.get("template_char_left", '«')
-        template_char_right = property_map.get("template_char_left", '»')
+        patterns = property_map.get("patterns")
+        language_file = property_map.get("language_file")
+        language_file_delimiter = property_map.get("language_file_delimiter")
+        template_char_left = property_map.get("template_char_left")
+        template_char_right = property_map.get("template_char_left")
 
         return TemplaterConfig(patterns, language_file, language_file_delimiter, template_char_left, template_char_right)
 
@@ -40,7 +40,7 @@ class TemplaterConfig:
     def from_args(cls, cmd_args: tuple[str]) -> "TemplaterConfig":
         return TemplaterConfig()
 
-def init() -> tuple[str, str, str, str, str, str]:
+def init() -> tuple[str, str, str, str, str, str, str]:
     parser = argparse.ArgumentParser(
         prog="AdriTemplater",
         description="A python script to template multi language html files",
@@ -53,13 +53,11 @@ def init() -> tuple[str, str, str, str, str, str]:
     parser.add_argument("-d", "--delimiter", help="delimiter used in the language csv file")
     parser.add_argument("-l", "--left", help="string on the left side of the to be templated string")
     parser.add_argument("-r", "--right", help="string on the right side of the to be templated string")
+    parser.add_argument("-c", "--config", help="path of the configuration file")
 
     args = parser.parse_args()
 
     return args.language_file, args.input_dir, args.output_dir, args.delimiter, args.left, args.right
-
-def get_defaults() -> dict[str, str]:
-    return dict([("delimiter", ';'), ("left", '«'), ("right", '»'), ("config_file_path", "templater_config.json")])
 
 def parse_languages(languages: list[str]) -> dict[str, list[str]]:
     language_map = dict()
@@ -188,9 +186,14 @@ def strip_parent_dir_and_file(path: str) -> tuple[str, str, str]:
     return parent_dir, intermediary_dirs, file_name # parent_dir output is currently not used
 
 
-def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, left: str, right: str) -> None:
-    defaults = get_defaults()
-    config = TemplaterConfig.from_json_file(defaults.get("config_file_path"))
+def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, left: str, right: str, config_file: str) -> None:    
+    config_file = "templater_config.json" if config_file is None else config_file
+    config = None
+
+    if (os.path.exists(config_file):
+        
+
+    config = TemplaterConfig.from_json_file()
     files_to_template = get_file_paths(input_dir, config.patterns)
 
     if delimiter is None:
@@ -212,5 +215,5 @@ def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, le
 
 if __name__ == "__main__":
     args = init()
-    main(args[0], args[1], args[2], args[3], args[4], args[5])
+    main(args[0], args[1], args[2], args[3], args[4], args[5], args[6])
 
