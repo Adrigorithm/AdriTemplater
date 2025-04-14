@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c55d310-acd3-4bf4-bb82-52a9199491ae" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templater.py" beforeDir="false" afterPath="$PROJECT_DIR$/templater.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templater_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/templater_config.json" afterDir="false" />
-    </list>
+    <list default="true" id="8c55d310-acd3-4bf4-bb82-52a9199491ae" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

@@ -5,6 +5,41 @@ import json
 
 from ast import Tuple
 
+class TemplaterConfig:
+    patterns = None
+    language_file = None
+    language_file_delimiter = None
+    template_char_left = None
+    template_char_right = None
+
+    def __init__(self, patterns: list[str], language_file: str, language_file_delimiter: str, template_char_left: str, template_char_right: str) -> None:
+        self.patterns = patterns
+        self.language_file = language_file
+        self.language_file_delimiter = language_file_delimiter
+        self.template_char_left = template_char_left
+        self.template_char_right = template_char_right
+    
+    @classmethod
+    def from_json_file(cls, path: str) -> "TemplaterConfig":
+        with open(path) as file:
+            property_map = json.load(file)
+
+            return TemplaterConfig.from_dictionary(property_map)
+
+    @classmethod
+    def from_dictionary(cls, property_map: dict) -> "TemplaterConfig":
+        patterns = property_map.get("patterns", ["**/*"])
+        language_file = property_map.get("language_file", "translations.csv")
+        language_file_delimiter = property_map.get("language_file_delimiter", "delimiter")
+        template_char_left = property_map.get("template_char_left", '«')
+        template_char_right = property_map.get("template_char_left", '»')
+
+        return TemplaterConfig(patterns, language_file, language_file_delimiter, template_char_left, template_char_right)
+
+    @classmethod
+    def from_args(cls, cmd_args: tuple[str]) -> "TemplaterConfig":
+        return TemplaterConfig()
+
 def init() -> tuple[str, str, str, str, str, str]:
     parser = argparse.ArgumentParser(
         prog="AdriTemplater",
@@ -155,8 +190,8 @@ def strip_parent_dir_and_file(path: str) -> tuple[str, str, str]:
 
 def main(language_file: str, input_dir: str, output_dir: str, delimiter: str, left: str, right: str) -> None:
     defaults = get_defaults()
-    config = parse_config_file(defaults.get("config_file_path"))
-    files_to_template = get_file_paths(input_dir, config["patterns"])
+    config = TemplaterConfig.from_json_file(defaults.get("config_file_path"))
+    files_to_template = get_file_paths(input_dir, config.patterns)
 
     if delimiter is None:
         delimiter = defaults.get("delimiter")
@@ -179,37 +214,3 @@ if __name__ == "__main__":
     args = init()
     main(args[0], args[1], args[2], args[3], args[4], args[5])
 
-class TemplaterConfig:
-    input_dir = None
-
-    def __init__(self, input_dir: str, output_dir: str, patterns: list[str], language_file: str, language_file_delimiter: str, template_char_left: str, template_char_right: str) -> None:
-        self.input_dir = input_dir
-        self.output_dir = output_dir
-        self.patterns = patterns
-        self.language_file = language_file
-        self.language_file_delimiter = language_file_delimiter
-        self.template_char_left = template_char_left
-        self.template_char_right = template_char_right
-    
-    @classmethod
-    def from_json_file(cls, path: str) -> "TemplaterConfig":
-        with open(path) as file:
-            property_map = json.load(file)
-
-            return TemplaterConfig.from_dictionary(property_map)
-
-    @classmethod
-    def from_dictionary(cls, property_map: dict) -> "TemplaterConfig":
-        input_dir = property_map.get("input_dir", '.')
-        output_dir = property_map.get("output_dir", '.')
-        patterns = property_map.get("patterns", ["**/*"])
-        language_file = property_map.get("language_file", "translations.csv")
-        language_file_delimiter = property_map.get("language_file_delimiter", "delimiter")
-        template_char_left = property_map.get("template_char_left", '«')
-        template_char_right = property_map.get("template_char_left", '»')
-
-        return TemplaterConfig(input_dir, output_dir, patterns, language_file, language_file_delimiter, template_char_left, template_char_right)
-
-    @classmethod
-    def from_args(cls, cmd_args: tuple[str]) -> "TemplaterConfig":
-        return TemplaterConfig()
