@@ -27,7 +27,7 @@ You can configure a lot. All options **except** for **patterns** are configurabl
 ### Examples
 The most basic usage (template everything from `./app/` to `./translated/` using `translations.csv` with default configuration (-d ';' -l « -r »)): `python3 templater.py translations.csv app/ translated/`
 ![sample](img/default.png)
-With a configuration file (and an override for `template_char_right` through the CLI parameter) it is much more flexible: `python3 templater.py translations.csv app/ translated/ -r '|' -c ./templater_cfg.json`
+With a configuration file (and an override for `template_char_right` through the CLI parameter) it is much more flexible. We template only one level down html files with template strings like this one `~1|`: `python3 templater.py translations.csv app/ translated/ -r '|' -c ./templater_cfg.json`
 ```json
 {
     "patterns": [
@@ -40,7 +40,7 @@ With a configuration file (and an override for `template_char_right` through the
 ![sample0](img/config.png)
 
 ### Notice
-- The program will look for a `templater_config.json` (or another if `config_file` specified) file, which should at the very least be a valid empty json object.
+- The program will look for a `templater_config.json` (or another if `config_file` specified) file, which if present should at the very least be a valid empty json object.
 
 ### Where is my pip package? wtf?
 **No.** I CBA to do this, it's just a singular python file, it makes no sense to me to put this on pip pkgs.
@@ -60,3 +60,4 @@ With a configuration file (and an override for `template_char_right` through the
 
 ## Planned
 - Blacklist mode to exclude files (right now it does the opposite)
+- Init script to generate a configuration file
